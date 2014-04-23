@@ -39,8 +39,21 @@ class Nixie:
         self.state.number = num
         self.update()
 
+    def pulse(self):
+        for i in xrange(128,256):
+            self.state.brightness = i
+            self.update()
+            time.sleep(0.01)
+
+        for i in xrange(256, 128, -1):
+            self.state.brightness = i
+            self.update()
+            time.sleep(0.01)
+
+
 nixie = Nixie()
 for i in xrange(0, 10):
     nixie.setNumber(i)
-    time.sleep(1)
+    nixie.pulse()
+    nixie.pulse()
 
