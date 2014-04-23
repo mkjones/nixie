@@ -1,6 +1,9 @@
 import serial
 import time
 import random
+import urllib2
+import json
+import sys
 
 class NixieState:
 
@@ -40,20 +43,38 @@ class Nixie:
         self.update()
 
     def pulse(self):
-        for i in xrange(128,256):
+        for i in xrange(32,256):
             self.state.brightness = i
             self.update()
-            time.sleep(0.01)
+            time.sleep(0.004)
 
-        for i in xrange(256, 128, -1):
+        for i in xrange(256, 32, -1):
             self.state.brightness = i
             self.update()
-            time.sleep(0.01)
+            time.sleep(0.004)
 
+
+def get_notifs_count(token):
+    url = 'https://graph.facebook.com/me/notifications?access_token=%s' % token
+    res = urllib2.urlopen(url).read()
+    data = json.loads(res)
+
+    summary = data['summary']
+    if len(summary) == 0:
+        return 0
+    return summary['unseen_count']
 
 nixie = Nixie()
-for i in xrange(0, 10):
-    nixie.setNumber(i)
-    nixie.pulse()
-    nixie.pulse()
+last_count = -1
+time_to_update = 15
+while True:
+    count = get_notifs_count(sys.argv[1])
+    nixie.setNumber(count)
+    if count != last_count:
+        start = time.time()
+        while time.time() - start < time_to_update:
+            nixie.pulse()
+    else:
+        time.sleep(time_to_update)
+    last_count = count
 
