@@ -42,6 +42,14 @@ class Nixie:
         self.state.number = num
         self.update()
 
+    def setLeft(self, value):
+        self.state.left = value
+        self.update()
+
+    def setRight(self, value):
+        self.state.right = value
+        self.update()
+
     def pulse(self):
         for i in xrange(32,256):
             self.state.brightness = i
@@ -69,7 +77,23 @@ last_count = -1
 time_to_update = 15
 while True:
     count = get_notifs_count(sys.argv[1])
-    nixie.setNumber(count)
+    if count > 29:
+        nixie.setLeft(True)
+        nixie.setRight(True)
+        nixie.setNumber(9)
+    elif count > 19:
+        nixie.setLeft(True)
+        nixie.setRight(True)
+        nixie.setNumber(count - 20)
+    elif count > 9:
+        nixie.setLeft(True)
+        nixie.setRight(False)
+        nixie.setNumber(count - 10)
+    else:
+        nixie.setLeft(False)
+        nixie.setRight(False)
+        nixie.setNumber(count)
+
     if count != last_count:
         start = time.time()
         while time.time() - start < time_to_update:
