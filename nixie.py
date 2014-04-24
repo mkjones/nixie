@@ -8,7 +8,7 @@ import sys
 class NixieState:
 
     def __init__(self, number=0, left=False, right=False, brightness=128,
-                 red=64, green=16, blue=32):
+                 red=32, green=4, blue=16):
         self.number = number
         self.left = left
         self.right = right
@@ -64,8 +64,14 @@ class Nixie:
 
 def get_notifs_count(token):
     url = 'https://graph.facebook.com/me/notifications?access_token=%s' % token
-    res = urllib2.urlopen(url).read()
-    data = json.loads(res)
+    try:
+        res = urllib2.urlopen(url)
+    except Error as e:
+        print e
+        return 0
+    print res.info()
+    print res.getcode()
+    data = json.loads(res.read())
 
     summary = data['summary']
     if len(summary) == 0:
